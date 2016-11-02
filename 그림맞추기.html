@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Document</title>
+ <style>
+  #memory_board{
+   width: 860px;
+   height: 570px;
+   border: 1px solid black;
+   margin: 100px auto;
+  }
+  #memory_board > div {
+   width: 100px;
+   height: 100px;
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   border: 1px solid black;
+   background-image: url('bg.jpg');
+   transition: transform 0.5s;  /*0.5초 지연*/
+   text-align: center;
+   line-height: 100px; /*글자 높이 영역*/
+  }
+  #memory_board > div:hover {
+   cursor: pointer;
+  }
+ </style>
+​
+ <script>
+  var memory_array = "AABBCCDDEEFFGGHHIIJJKKLL".split(""); //쪼개기
+  var clicked = [];
+  
+  Array.prototype.shuffle = function() {
+   var temp, j;
+   for(var i = 1; i < memory_array.length; i++) {
+    j = Math.floor(Math.random()*(i+1));
+    temp = this[i-1];
+    this[i-1] = this[j];
+    this[j] = temp;
+   }
+  }
+  function newBoard(){
+   start = new Date();
+   memory_array.shuffle();
+   var board = document.getElementById("memory_board");
+   var output = "";
+   for(var i=0; i<24; i++)
+    output += "<div onclick='flip(this, " + i + ")'></div>";
+   board.innerHTML = output;
+  }
+  var rightCount = 0;
+  var clickedTile = [];
+  function flip(tile, idx){
+   if(tile.innerHTML=="" && clicked.length < 2){ //두번 클릭했으면 다 실행하고 다시 클릭되게 
+    tile.innerHTML = memory_array[idx];
+    tile.style.color = "black";
+    tile.style.fontWeight = "bold";
+    tile.style.fontSize = "30px";
+    tile.style.transform = "rotateY(360deg)"; //y축으로 180도 돌리기
+    tile.style.background = "none";
+    
+    clicked.push(memory_array[idx]);  //배열은 push로 차곡차곡 값을 받을 수있다.
+    clickedTile.push(tile);
+    if(clicked.length == 2) {//두개 클릭 됨.
+     if(clicked[0] == clicked[1]) { //같은게 뒤집힘.
+      rightCount += 2;
+      clicked = [];
+      clickedTile = [];
+      if(rightCount == memory_array.length){ //게임 완료
+       end = new Date();
+       alert("Board Cleard...! Generating new Game! " + (end-start)+"ms elpased!");
+       rightCount = 0;
+       newBoard();
+      }
+     }else { //다른게 뒤집힘.
+      setTimeout(flipBack, 700);
+     }
+    }
+   }
+  }
+  function flipBack() {
+   clicked = [];
+   clickedTile[0].innerHTML = "";
+   clickedTile[0].style.background = "url('bg.jpg')";
+   clickedTile[0].style.transform = "rotateY(180deg)";
+   clickedTile[1].innerHTML = "";
+   clickedTile[1].style.background = "url('bg.jpg')";
+   clickedTile[1].style.transform = "rotateY(180deg)";
+   clickedTile = [];
+  }
+ </script>
+​
+</head>
+<body>
+ <div id="memory_board">
+ <script>
+  newBoard();
+ </script>
+ </div>
+</body>
+</html>
+
+
